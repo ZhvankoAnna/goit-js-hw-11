@@ -6,12 +6,11 @@ import { smoothScroll } from './js/smooth-scroll';
 
 let searchReq = null;
 let pageCount = null;
-let totalImgCount = null;
 
 const formEl = document.querySelector('.search-form');
 
 formEl.addEventListener('submit', handleFormSubmit);
-window.addEventListener('scroll', debounce(handleWindowScroll, 500));
+window.addEventListener('scroll', debounce(handleWindowScroll, 300));
 
 async function handleFormSubmit(e) {
   e.preventDefault();
@@ -19,24 +18,23 @@ async function handleFormSubmit(e) {
     return
   }
 
+  searchReq = e.target.elements.searchQuery.value.trim();
+
   gallaryEl.innerHTML = '';
   pageCount = 1;
 
-  searchReq = e.target.elements.searchQuery.value.trim();
-
-  if (searchReq === '') {
+  if (searchReq === '' || e.target.elements.searchQuery.value.trim() === '') {
     return Notify.failure('Input some text for search');
   }
 
-  const { totalHits, hits } = await getImages(searchReq, pageCount);
-  totalImgCount = totalHits;
+  const data = await getImages(searchReq, pageCount);
 
     if (pageCount === 1) {
-    Notify.success(`Hoorey! We found ${totalHits} images`);
+    Notify.success(`Hoorey! We found ${data.totalHits} images`);
   }
   pageCount++;
 
-  craeteMarkup(hits);
+  craeteMarkup(data.hits);
 }
 
 async function handleWindowScroll(e) {
@@ -45,14 +43,13 @@ async function handleWindowScroll(e) {
   const clientHeight = document.documentElement.clientHeight;
 
   if (scrollTop + clientHeight > scrollHeight - clientHeight) {
-    const { totalHits, hits } = await getImages(searchReq, pageCount);
+    const data = await getImages(searchReq, pageCount);
 
-    craeteMarkup(hits);
+    craeteMarkup(data.hits);
     smoothScroll();
-    if (hits < 40) {
+    if (data.hits < 40) {
       return Notify.info("We're sorry, but you've reached the end of search results.");
     }
     pageCount++;
-    console.log(pageCount)
   }
 }
