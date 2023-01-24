@@ -6,6 +6,7 @@ import { smoothScroll } from './js/smooth-scroll';
 
 let searchReq = null;
 let pageCount = null;
+let totalImgCount = null;
 
 const formEl = document.querySelector('.search-form');
 
