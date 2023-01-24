@@ -1,10 +1,11 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from 'lodash.debounce';
-import {pageCount, getImages} from "./js/get-images"
-import {gallaryEl, craeteMarkup} from "./js/create-markup"
-import {smoothScroll} from "./js/smooth-scroll"
+import { getImages } from './js/get-images';
+import { gallaryEl, craeteMarkup } from './js/create-markup';
+import { smoothScroll } from './js/smooth-scroll';
 
 let searchReq = null;
+let pageCount = null;
 
 const formEl = document.querySelector('.search-form');
 
@@ -13,18 +14,26 @@ window.addEventListener('scroll', debounce(handleWindowScroll, 500));
 
 async function handleFormSubmit(e) {
   e.preventDefault();
+  if(searchReq === e.target.elements.searchQuery.value.trim()){
+    return
+  }
 
   gallaryEl.innerHTML = '';
   pageCount = 1;
 
   searchReq = e.target.elements.searchQuery.value.trim();
 
-  if(searchReq === "") {
-    return Notify.failure("Input some text for search")
+  if (searchReq === '') {
+    return Notify.failure('Input some text for search');
   }
 
-  const { totalHits, hits } = await getImages(searchReq);
+  const { totalHits, hits } = await getImages(searchReq, pageCount);
   totalImgCount = totalHits;
+
+    if (pageCount === 1) {
+    Notify.success(`Hoorey! We found ${totalHits} images`);
+  }
+  pageCount++;
 
   craeteMarkup(hits);
 }
@@ -35,9 +44,14 @@ async function handleWindowScroll(e) {
   const clientHeight = document.documentElement.clientHeight;
 
   if (scrollTop + clientHeight > scrollHeight - clientHeight) {
-    const { hits } = await getImages(searchReq);
+    const { totalHits, hits } = await getImages(searchReq, pageCount);
 
     craeteMarkup(hits);
     smoothScroll();
+    if (hits < 40) {
+      return Notify.info("We're sorry, but you've reached the end of search results.");
+    }
+    pageCount++;
+    console.log(pageCount)
   }
 }
