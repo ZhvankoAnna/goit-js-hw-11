@@ -1,6 +1,6 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from 'lodash.debounce';
-import {getImages} from "./js/get-images"
+import {pageCount, getImages} from "./js/get-images"
 import {gallaryEl, craeteMarkup} from "./js/create-markup"
 import {smoothScroll} from "./js/smooth-scroll"
 

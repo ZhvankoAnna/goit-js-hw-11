@@ -3,7 +3,7 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 const BASE_URL = 'https://pixabay.com/api';
 const API_KEY = '32975717-e5ee65230820405f183c875ea';
-let pageCount = 1;
+export let pageCount = 1;
 
 export async function getImages(searchReq) {
     try {
